@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -29,4 +28,6 @@ public class Patient {
     @OneToMany(mappedBy = "patient",cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH}) // we don't want to cascade type all
     private List<Appointment> appointments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "patient",cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH}) // we don't want to cascade type all
+    private List<Transaction> Transactions = new ArrayList<>();
 }

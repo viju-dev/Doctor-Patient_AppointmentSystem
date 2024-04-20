@@ -3,12 +3,15 @@ package com.example.appointmentSystem.Services.Impl;
 import com.example.appointmentSystem.Entities.Appointment;
 import com.example.appointmentSystem.Entities.Doctor;
 import com.example.appointmentSystem.Entities.Patient;
+import com.example.appointmentSystem.Entities.Transaction;
+import com.example.appointmentSystem.Enums.TransactionStatusEnum;
 import com.example.appointmentSystem.Exception.GlobalCustomException;
 import com.example.appointmentSystem.Exception.NotAvailableException;
 import com.example.appointmentSystem.Exception.ResourceNotFoundException;
 import com.example.appointmentSystem.Repositories.AppointmentRepo;
 import com.example.appointmentSystem.Repositories.DoctorRepo;
 import com.example.appointmentSystem.Repositories.PatientRepo;
+import com.example.appointmentSystem.Repositories.TransactionRepo;
 import com.example.appointmentSystem.ResponseDtos.AppointmentResponseDto;
 import com.example.appointmentSystem.Services.AppointmentService;
 import org.modelmapper.ModelMapper;
@@ -35,6 +38,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    TransactionRepo transactionRepo;
 
 
     //    @Scheduled(cron = "0 0 9 * * MON-SAT")  - by using scheduled annotation we can make slot creating process automated at specific time of everyday from monday to saturday
@@ -74,7 +80,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepo.findById(appointmentId).orElseThrow(() -> new ResourceNotFoundException("appointment","id",String.valueOf(appointmentId)));
         Patient patient = patientRepo.findById(patientId).orElseThrow(() -> new ResourceNotFoundException("patient","id",String.valueOf(patientId)));
         if(appointment.getIsBooked() && appointment.getPatient().equals(patient)){
-            throw new GlobalCustomException("you have alreday booked ytgis appointment");
+            throw new GlobalCustomException("you have already booked this appointment");
         }
         else if (appointment.getIsBooked()) {
             throw new NotAvailableException("appointment", "id", String.valueOf(appointmentId));
@@ -82,8 +88,17 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.setIsBooked(true);
             appointment.setBookedAt(LocalDateTime.now());
             appointment.setPatient(patient);
+            appointment.setBookedAt(LocalDateTime.now());
         }
         Appointment savedAppointment = appointmentRepo.save(appointment);
+        //making transaction
+        Transaction transaction = new Transaction();
+        transaction.setAppointment(appointment);
+        transaction.setPatient(patient);
+        transaction.setStatus(TransactionStatusEnum.BOOKING);
+        transaction.setTimestamp(LocalDateTime.now());
+        transactionRepo.save(transaction);
+
         return this.modelMapper.map(savedAppointment, AppointmentResponseDto.class);
     }
 
@@ -117,9 +132,20 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public void cancelAppointment(int appointmentId) {
         Appointment appointment = appointmentRepo.findById(appointmentId).orElseThrow(() -> new ResourceNotFoundException("appointment","id",String.valueOf(appointmentId)));
+
+        Transaction transaction = new Transaction();
+        transaction.setAppointment(appointment);
+        transaction.setPatient(appointment.getPatient());
+        transaction.setStatus(TransactionStatusEnum.CANCELLATION);
+        transaction.setTimestamp(LocalDateTime.now());
+
         appointment.setPatient(null);
         appointment.setIsBooked(false);
         appointment.setBookedAt(null);
+
         appointmentRepo.save(appointment);
+
+        transactionRepo.save(transaction);
+
     }
 }
