@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "Appoint System Apis", version = "v1" ))//description = "we n"
+@OpenAPIDefinition(info = @Info(title = "Appoint System Apis", version = "v1" ))
 public class AppointmentSystemApplication {
 
 

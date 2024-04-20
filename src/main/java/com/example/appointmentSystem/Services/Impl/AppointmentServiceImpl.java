@@ -37,7 +37,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private ModelMapper modelMapper;
 
 
-    //    @Scheduled(cron = "0 0 9 * * MON-SAT")
+    //    @Scheduled(cron = "0 0 9 * * MON-SAT")  - by using scheduled annotation we can make slot creating process automated at specific time of everyday from monday to saturday
     @Override
     public List<AppointmentResponseDto> createAppointmentSlots(int doctorId) {
         Doctor doctor = doctorRepo.findById(doctorId).orElseThrow(() -> new ResourceNotFoundException("doctor","id",String.valueOf(doctorId)));
