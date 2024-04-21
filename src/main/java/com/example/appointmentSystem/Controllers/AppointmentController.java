@@ -22,9 +22,9 @@ public class AppointmentController {
     @Operation(summary = "Create Appointments Slots", description = "If doctor is available he'll call this api to set his availability and so the slots for that specific doctor get created for that day")
     @PostMapping("/{doctorId}")
     ResponseEntity createAppointmentSlots(@PathVariable int doctorId) {
-        if (LocalDate.now().getDayOfWeek().toString().equalsIgnoreCase("sunday")) {
-            throw new GlobalCustomException("Today is sunday have some rest doctor :) ");
-        }
+//        if (LocalDate.now().getDayOfWeek().toString().equalsIgnoreCase("sunday")) {
+//            throw new GlobalCustomException("Today is sunday have some rest doctor :) ");
+//        }
         List<AppointmentResponseDto> appointments = this.appointmentService.createAppointmentSlots(doctorId);
         return new ResponseEntity<>(new ApiResponse<>(" Successfully created Appointments for today..!", true, appointments), HttpStatus.CREATED);
     }
